@@ -20,80 +20,78 @@ $request = Request::capture();
 $uri = $request->uri;
 $method = $request->method;
 
-switch ($uri) {
-    case '/api/login':
-        if ($method === 'POST') {
-            $controller = $container->make(AuthController::class);
-            $controller->login($request)->send();
-        }
+try {
+    switch ($uri) {
+        case '/api/login':
+            if ($method === 'POST') {
+                $controller = $container->make(AuthController::class);
+                $controller->login($request)->send();
+            }
+            break;
 
-        break;
+        case '/api/register':
+            if ($method === 'POST') {
+                $controller = $container->make(AuthController::class);
+                $controller->register($request)->send();
+            }
+            break;
 
-    case '/api/register':
-        if ($method === 'POST') {
-            $controller = $container->make(AuthController::class);
-            $controller->register($request)->send();
-        }
+        case '/api/logout':
+            if ($method === 'POST') {
+                $controller = $container->make(AuthController::class);
+                $controller->logout()->send();
+            }
+            break;
 
-        break;
-
-    case '/api/logout':
-        if ($method === 'POST') {
-            $controller = $container->make(AuthController::class);
-            $controller->logout()->send();
-        }
-
-        break;
-
-    case '/api/page-a':
-        $controller = $container->make(PageController::class);
-        if ($method === 'GET') {
-            $controller->viewPage(ActivitiesPageEnum::PAGE_A)->send();
-        } elseif ($method === 'POST') {
-            $controller->buttonClick(ActivitiesPageEnum::PAGE_A)->send();
-        }
-
-        break;
-
-    case '/api/page-b':
-        $controller = $container->make(PageController::class);
-        if ($method === 'GET') {
-            $controller->viewPage(ActivitiesPageEnum::PAGE_B)->send();
-        } elseif ($method === 'POST') {
-            $controller->buttonClick(ActivitiesPageEnum::PAGE_B)->send();
-        }
-
-        break;
-
-    case '/api/download':
-        if ($method === 'GET') {
+        case '/api/page-a':
             $controller = $container->make(PageController::class);
-            $controller->download()->send();
-        }
-        break;
+            if ($method === 'GET') {
+                $controller->viewPage(ActivitiesPageEnum::PAGE_A)->send();
+            } elseif ($method === 'POST') {
+                $controller->buttonClick(ActivitiesPageEnum::PAGE_A)->send();
+            }
+            break;
 
-    case '/api/stats':
-        if ($method === 'POST') {
-            $controller = $container->make(StatsController::class);
-            $controller->getStats($request)->send();
-        }
+        case '/api/page-b':
+            $controller = $container->make(PageController::class);
+            if ($method === 'GET') {
+                $controller->viewPage(ActivitiesPageEnum::PAGE_B)->send();
+            } elseif ($method === 'POST') {
+                $controller->buttonClick(ActivitiesPageEnum::PAGE_B)->send();
+            }
+            break;
 
-        break;
+        case '/api/download':
+            if ($method === 'GET') {
+                $controller = $container->make(PageController::class);
+                $controller->download()->send();
+            }
+            break;
 
-    case '/api/reports':
-        if ($method === 'POST') {
-            $controller = $container->make(ReportController::class);
-            $controller->getReports($request)->send();
-        }
-        break;
+        case '/api/stats':
+            if ($method === 'POST') {
+                $controller = $container->make(StatsController::class);
+                $controller->getStats($request)->send();
+            }
+            break;
 
-    case '/api/reports/download':
-        if ($method === 'GET') {
-            $controller = $container->make(ReportController::class);
-            $controller->downloadReports($request)->send();
-        }
-        break;
+        case '/api/reports':
+            if ($method === 'POST') {
+                $controller = $container->make(ReportController::class);
+                $controller->getReports($request)->send();
+            }
+            break;
 
-    default:
-        Response::error('Not found', 404)->send();
+        case '/api/reports/download':
+            if ($method === 'GET') {
+                $controller = $container->make(ReportController::class);
+                $controller->downloadReports($request)->send();
+            }
+            break;
+
+        default:
+            Response::error('Not found', 404)->send();
+    }
+} catch (Throwable $e) {
+    Response::error('Internal Server Error: ' . $e->getMessage(), 500)->send();
 }
